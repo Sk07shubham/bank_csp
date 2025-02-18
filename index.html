@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bank Balance Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+        .container-wrapper {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .container, .notes-container, .calculator {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            max-width: 400px;
+        }
+        .notes-container {
+            max-width: 250px;
+        }
+        .calculator {
+            max-width: 250px;
+            text-align: center;
+        }
+        h2 {
+            color: #007BFF;
+        }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: block;
+        }
+        button {
+            background-color: #007BFF;
+            color: black; /* Updated color */
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result, #total-notes {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+        }
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .calculator-buttons button {
+            background-color: #f1f1f1;
+            font-size: 20px;
+            border: 1px solid #ccc;
+            padding: 20px;
+            cursor: pointer;
+        }
+        .calculator-buttons button:hover {
+            background-color: #ddd;
+        }
+        .note-total {
+            font-size: 14px;
+            margin-top: 5px;
+            color: #333;
+        }
+    </style>
+    <script>
+        function evaluateInput(value) {
+            try {
+                return eval(value.replace(/,/g, "")) || 0;
+            } catch {
+                return 0;
+            }
+        }
+
+        function formatNumberWithCommas(input) {
+            return input.replace(/\d+/g, function(match) {
+                return Number(match).toLocaleString("en-IN");
+            });
+        }
+
+        function updateFormattedValue(event) {
+            let inputField = event.target;
+            let rawValue = inputField.value.replace(/,/g, "");
+            inputField.value = formatNumberWithCommas(rawValue);
+        }
+
+        function calculateBalance() {
+            let totalCash = evaluateInput(document.getElementById('totalCash').value);
+            let openingBalance = evaluateInput(document.getElementById('openingBalance').value);
+            let personalUse = evaluateInput(document.getElementById('personalUse').value);
+            let cashWithdrawal = evaluateInput(document.getElementById('cashWithdrawal').value);
+            let physicalCash = evaluateInput(document.getElementById('physicalCash').value);
+            
+            let X = totalCash + openingBalance;
+            let Y = X - personalUse;
+            let Z = Y - cashWithdrawal;
+            let passbookBalance = Z - physicalCash;
+            
+            document.getElementById('result').innerHTML = "Passbook Balance: ₹" + formatNumberWithCommas(passbookBalance.toFixed(2));
+        }
+
+        function calculateTotalNotes() {
+            let denominations = [500, 200, 100, 50, 20, 10];
+            let total = 0, totalNotes = 0;
+            
+            denominations.forEach(denom => {
+                let count = parseInt(document.getElementById(`note-${denom}`).value) || 0;
+                total += denom * count;
+                totalNotes += count;
+                let noteTotal = denom * count;
+                document.getElementById(`note-total-${denom}`).innerHTML = `${denom} × ${count} = ₹${noteTotal}`;
+            });
+            
+            document.getElementById('total-notes').innerHTML = "Total: ₹" + total + " | Notes: " + totalNotes;
+        }
+
+        // Calculator Logic
+        let calculatorScreen = '';
+
+        function updateScreen(value) {
+            calculatorScreen += value;
+            document.getElementById('calculator-screen').value = calculatorScreen;
+        }
+
+        function clearScreen() {
+            calculatorScreen = '';
+            document.getElementById('calculator-screen').value = '';
+        }
+
+        function calculateResult() {
+            try {
+                calculatorScreen = eval(calculatorScreen).toString();
+                document.getElementById('calculator-screen').value = calculatorScreen;
+            } catch {
+                document.getElementById('calculator-screen').value = 'Error';
+                calculatorScreen = '';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        Website for CSP Bank by Shubham
+    </div>
+
+    <div class="container-wrapper">
+        <div class="notes-container">
+            <h2>Notes Calculator</h2>
+            <label>500 × </label><input type="number" id="note-500" oninput="calculateTotalNotes()" value="0">
+            <div id="note-total-500" class="note-total">500 × 0 = ₹0</div>
+            
+            <label>200 × </label><input type="number" id="note-200" oninput="calculateTotalNotes()" value="0">
+            <div id="note-total-200" class="note-total">200 × 0 = ₹0</div>
+            
+            <label>100 × </label><input type="number" id="note-100" oninput="calculateTotalNotes()" value="0">
+            <div id="note-total-100" class="note-total">100 × 0 = ₹0</div>
+            
+            <label>50 × </label><input type="number" id="note-50" oninput="calculateTotalNotes()" value="0">
+            <div id="note-total-50" class="note-total">50 × 0 = ₹0</div>
+            
+            <label>20 × </label><input type="number" id="note-20" oninput="calculateTotalNotes()" value="0">
+            <div id="note-total-20" class="note-total">20 × 0 = ₹0</div>
+            
+            <label>10 × </label><input type="number" id="note-10" oninput="calculateTotalNotes()" value="0">
+            <div id="note-total-10" class="note-total">10 × 0 = ₹0</div>
+
+            <div id="total-notes"></div>
+        </div>
+
+        <div class="container">
+            <h2>Bank Balance Calculator</h2>
+            <label>Total Cash (Physical)</label>
+            <input type="text" id="totalCash" oninput="updateFormattedValue(event)">
+            <label>Opening Balance</label>
+            <input type="text" id="openingBalance" oninput="updateFormattedValue(event)">
+            <label>Rupees (Personal Use)</label>
+            <input type="text" id="personalUse" oninput="updateFormattedValue(event)">
+            <label>Total Cash Withdrawal</label>
+            <input type="text" id="cashWithdrawal" oninput="updateFormattedValue(event)">
+            <label>Cash (Physical)</label>
+            <input type="text" id="physicalCash" oninput="updateFormattedValue(event)">
+            <button onclick="calculateBalance()">Calculate Balance</button>
+            <div id="result"></div>
+        </div>
+
+        <div class="calculator">
+            <h2>Calculator</h2>
+            <input type="text" id="calculator-screen" disabled>
+            <div class="calculator-buttons">
+                <button onclick="updateScreen('1')">1</button>
+                <button onclick="updateScreen('2')">2</button>
+                <button onclick="updateScreen('3')">3</button>
+                <button onclick="updateScreen('+')">+</button>
+                <button onclick="updateScreen('4')">4</button>
+                <button onclick="updateScreen('5')">5</button>
+                <button onclick="updateScreen('6')">6</button>
+                <button onclick="updateScreen('-')">-</button>
+            <button onclick="updateScreen('7')">7</button>
+            <button onclick="updateScreen('8')">8</button>
+            <button onclick="updateScreen('9')">9</button>
+            <button onclick="updateScreen('*')">*</button>
+            <button onclick="updateScreen('0')">0</button>
+            <button onclick="clearScreen()">C</button>
+            <button onclick="calculateResult()">=</button>
+            <button onclick="updateScreen('/')">/</button>
+        </div>
+    </div>
+</body>
+</html>
